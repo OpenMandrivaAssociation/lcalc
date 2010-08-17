@@ -14,7 +14,7 @@ Group:		Sciences/Mathematics
 License:	LGPL
 Summary:	C++ L-function class library and command line interface
 Version:	1.23
-Release:	%mkrel 1
+Release:	%mkrel 2
 Source:		http://pmmac03.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-%{version}.tar.gz
 # From sage tarball, lcalc spkg, debian directory
 Source1:	lcalc.1
@@ -36,6 +36,7 @@ C++ L-function class library and command line interface.
 %package	devel
 Group:		Development/C++
 Summary:	Development files for %{name}
+Requires:	%{name} = %{version}-%{release}
 
 %description	devel
 Development files for %{name}.
