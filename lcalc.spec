@@ -14,7 +14,7 @@ Group:		Sciences/Mathematics
 License:	LGPL
 Summary:	C++ L-function class library and command line interface
 Version:	1.23
-Release:	%mkrel 4
+Release:	%mkrel 5
 Source:		http://pmmac03.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-%{version}.tar.gz
 # From sage tarball, lcalc spkg, debian directory
 Source1:	lcalc.1
@@ -30,6 +30,7 @@ BuildRequires:	libpari-devel
 
 Patch0:		L-1.21.g++4.3.2-mpfr.patch
 Patch1:		L-1.23-pari.patch
+Patch2:		L-1.23-lcalc_to_double.patch
 
 %description
 C++ L-function class library and command line interface.
@@ -49,6 +50,7 @@ Development files for %{name}.
 %patch0	-p1
 %endif
 %patch1 -p1
+%patch2 -p1
 
 # Make it actually link with the generated library
 perl -pi							\
