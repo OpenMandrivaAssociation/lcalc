@@ -116,3 +116,41 @@ rm -rf %{buildroot}
 %{_includedir}/lcalc
 %{_includedir}/Lfunction/*
 %{_libdir}/libLfunction.so
+
+
+%changelog
+* Tue Jan 24 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.23-6mdv2012.0
++ Revision: 767481
+- Rebuild with newer pari.
+
+* Sat Apr 09 2011 Paulo Andrade <pcpa@mandriva.com.br> 1.23-5
++ Revision: 652002
+- Correct build with gcc 4.6.0
+
+* Thu Nov 11 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-4mdv2011.0
++ Revision: 595921
+- Rebuild with newer pari
+
+* Tue Aug 17 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-3mdv2011.0
++ Revision: 571049
++ rebuild (emptylog)
+
+* Tue Aug 17 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-2mdv2011.0
++ Revision: 571038
++ rebuild (emptylog)
+
+* Wed Jul 14 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-1mdv2011.0
++ Revision: 552977
+- Update to version 1.23.
+
+* Sat May 09 2009 Paulo Andrade <pcpa@mandriva.com.br> 1.21-2mdv2010.0
++ Revision: 373565
++ rebuild (emptylog)
+
+* Thu Mar 26 2009 Paulo Andrade <pcpa@mandriva.com.br> 1.21-1mdv2009.1
++ Revision: 361222
+- Initial import of lcalc version 1.21.
+  C++ L-function class library and command line interface
+  http://pmmac03.math.uwaterloo.ca/~mrubinst/L_function_public/L.html
+- lcalc
+
