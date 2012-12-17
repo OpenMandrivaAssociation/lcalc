@@ -1,63 +1,65 @@
-# mpfr patch not complete. Could be done by changing most places a
-# template wants a mpfr_t to a double, or calling the proper mpfr_foo
-# function. But due to large amount of patches required (and only a
-# few done in patch0), better to just disable it to avoid breaking
-# the package.
+%define libLfunction		%mklibname    Lfunction 1
+%define libLfunction_devel	%mklibname -d Lfunction
 
-# mpfr build is also not enabled in sagemath
-
-%define with_mpfr	0
-%define name		lcalc
-
-Name:		%{name}
+Name:		lcalc
 Group:		Sciences/Mathematics
-License:	LGPL
+License:	GPLv2+
 Summary:	C++ L-function class library and command line interface
 Version:	1.23
-Release:	%mkrel 6
-Source:		http://pmmac03.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-%{version}.tar.gz
+Release:	7
+Source0:	http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-1.23.tar.gz
 # From sage tarball, lcalc spkg, debian directory
 Source1:	lcalc.1
-URL:		http://pmmac03.math.uwaterloo.ca/~mrubinst/L_function_public/L.html
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
-
+URL:		http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/L.html
 BuildRequires:	gcc-c++
-%if %{with_mpfr}
-BuildRequires:	mpfr-devel
-%endif
 BuildRequires:	gmpxx-devel
 BuildRequires:	libpari-devel
-
-Patch0:		L-1.21.g++4.3.2-mpfr.patch
+Patch0:		L-fix-broken-include-of-libc++.diff
+# Build with newer pari
 Patch1:		L-1.23-pari.patch
+# Correct problem with inline functions casting to double with gcc 4.6 or newer
 Patch2:		L-1.23-lcalc_to_double.patch
 
 %description
 C++ L-function class library and command line interface.
 
-%package	devel
+%package	-n %{libLfunction}
+Group:		Sciences/Mathematics
+Summary:	Runtime library for %{name}
+
+%description	-n %{libLfunction}
+Runtime library for %{name}.
+
+%package	-n %{libLfunction_devel}
 Group:		Development/C++
 Summary:	Development files for %{name}
-Requires:	%{name} = %{version}-%{release}
+%rename		%{name}-devel
+Requires:	%{libLfunction} = %{EVRD}
 
-%description	devel
+%description	-n %{libLfunction_devel}
 Development files for %{name}.
 
 %prep
 %setup -q -n L-%{version}
-
-%if %{with_mpfr}
-%patch0	-p1
-%endif
+%patch0 -p1
 %patch1 -p1
 %patch2 -p1
+rm -f .*DS_Store
+rm -f include/.*{DS_Store,.swp,.swap.crap,.back}
+rm -f src/.*{DS_Store,.swp}
+find . | xargs chmod a+r
 
 # Make it actually link with the generated library
-perl -pi							\
-	-e 's|/lib/|/%{_lib}/|g;'				\
-	-e 's|libLfunction.so|libLfunction.so.%{version}|g;'	\
-	-e 's|(\$\(CC\).*cc )lib(Lfunction).so.%{version}|$1-L. -l$2|g;'\
-	src/Makefile
+sed -e 's|/lib/|/%{_lib}/|g' \
+ -e "s|^[^#]*LDFLAGS2.*LDFLAGS1.*\$|LDFLAGS2 = \$(LDFLAGS1) $RPM_LD_FLAGS|" \
+ -e 's|libLfunction.so|libLfunction.so.%{version}|g' \
+ -e 's|\($(CC).*cc\) libLfunction.so.%{version}|\1 -L. -lLfunction|g' \
+ -e 's|-Xlinker -rpath .*||;' \
+ -e "s|\(DYN_OPTION=shared\)|\1 -Wl,-soname=libLfunction.so.%{version} -lgomp $RPM_LD_FLAGS|" \
+ -e 's|#\(OPENMP_FLAG = -fopenmp\)|\1|' \
+ -i src/Makefile
+sed -i -e 's/\r//' src/example_programs/example.cc
+# Upstream tarball comes with a prebuilt library
 rm -f src/libLfunction.a
 
 %build
@@ -65,60 +67,62 @@ pushd src
 # Create link before library is created
     ln -sf libLfunction.so.%{version} libLfunction.so
     %make							\
-%if %{with_mpfr}
-	PREPROCESSOR_DEFINE="-DUSE_MPFR"			\
-%endif
+	EXTRA="$RPM_OPT_FLAGS"					\
 	PARI_DEFINE="-DINCLUDE_PARI"				\
 	LOCATION_PARI_H="%{_includedir}/pari"			\
 	LOCATION_PARI_LIBRARY="%{_libdir}"			\
 	all
 popd
+rm -f src/example_programs/example
 
 %install
-mkdir -p %{buildroot}%{_includedir}
-mkdir -p %{buildroot}%{_libdir}
-mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{_mandir}/man1
+mkdir -p $RPM_BUILD_ROOT{%{_includedir},%{_libdir},%{_bindir},%{_mandir}/man1}
 pushd src
-    %make							\
-	INSTALL_DIR="%{buildroot}%{_prefix}"			\
-	install
-    rm -f %{buildroot}%{_includedir}/Lfunction/*.back
-    rm -f %{buildroot}%{_includedir}/Lfunction/.??*
-    rm -f %{buildroot}%{_includedir}/Lfunction/*.h.??*
-    mkdir -p %{buildroot}%{_datadir}/%{name}
-    cp -fa example_data_files/* %{buildroot}%{_datadir}/%{name}
+    make INSTALL_DIR="$RPM_BUILD_ROOT%{_prefix}" install
+    mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
+    pushd example_data_files
+	for sample in *; do
+	    install -p -m644 $sample $RPM_BUILD_ROOT%{_datadir}/%{name}/$sample
+	done
+    popd
+    install -m644 example_programs/example.cc \
+	$RPM_BUILD_ROOT%{_datadir}/%{name}/example.cc
 popd
-cp %{SOURCE1} %{buildroot}%{_mandir}/man1
-lzma -f -z %{buildroot}%{_mandir}/man1/`basename %{SOURCE1}`
-pushd %{buildroot}%{_libdir}
-    ln -sf libLfunction.so.%{version} libLfunction.so
-popd
-chmod a+r %{buildroot}%{_includedir}/Lfunction/*.h
-pushd %{buildroot}%{_includedir}
+install -p -m644 %{SOURCE1} $RPM_BUILD_ROOT%{_mandir}/man1
+ln -sf libLfunction.so.%{version} $RPM_BUILD_ROOT%{_libdir}/libLfunction.so
+# Correct permissions
+chmod 644 $RPM_BUILD_ROOT%{_includedir}/Lfunction/*.h
+# Make install creates include/Lfunction but sagemath wants include/lcalc
+pushd $RPM_BUILD_ROOT%{_includedir}
     ln -sf Lfunction lcalc
 popd
 
-%clean
-rm -rf %{buildroot}
-
 %files
-%defattr(-,root,root)
+%doc CONTRIBUTORS
+%doc COPYING
+%doc README
 %{_bindir}/%{name}
 %dir %{_datadir}/%{name}
-%{_libdir}/libLfunction.so.%{version}
 %{_datadir}/%{name}/*
 %{_mandir}/man1/*
 
-%files devel
-%defattr(-,root,root)
-%dir %{_includedir}/Lfunction
+%files		-n %{libLfunction}
+%{_libdir}/libLfunction.so.%{version}
+
+%files		-n %{libLfunction_devel}
+%{_includedir}/Lfunction
 %{_includedir}/lcalc
-%{_includedir}/Lfunction/*
 %{_libdir}/libLfunction.so
 
-
 %changelog
+* Mon Dec 17 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.23-7
+- Drop unfinished mpfr support patch.
+- Update URL for source and home page.
+- Generate library with a proper soname.
+- Drop BuildRoot, mkrel, defattr and clean.
+- Create library subpackage with proper major in name.
+- Rename lcalc-devel subpackage to libLfunction_devel.
+
 * Tue Jan 24 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.23-6mdv2012.0
 + Revision: 767481
 - Rebuild with newer pari.

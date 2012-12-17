@@ -1,0 +1,19 @@
+diff -ur L-1.23.orig/include/Lglobals.h L-1.23/include/Lglobals.h
+--- L-1.23.orig/include/Lglobals.h	2009-02-24 22:44:08.000000000 -0800
++++ L-1.23/include/Lglobals.h	2011-10-27 23:11:58.450586099 -0700
+@@ -42,13 +42,14 @@
+ //#include <complex>     //for complex numbers
+ typedef complex<Double> Complex;
+ 
++#include<limits>
++
+ #ifdef USE_LONG_DOUBLE
+     #include "Lcommon_ld.h"
+ #else
+     #include "Lcommon.h"
+ #endif
+ 
+-#include<limits>
+ #include<iostream>
+ 
+ //#include "Lint_complex.h"
