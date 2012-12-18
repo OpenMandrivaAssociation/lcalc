@@ -13,6 +13,7 @@ Source1:	lcalc.1
 URL:		http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/L.html
 BuildRequires:	gcc-c++
 BuildRequires:	gmpxx-devel
+BuildRequires:	gomp-devel
 BuildRequires:	libpari-devel
 Patch0:		L-fix-broken-include-of-libc++.diff
 # Build with newer pari
