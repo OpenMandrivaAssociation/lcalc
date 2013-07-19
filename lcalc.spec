@@ -2,14 +2,14 @@
 %define libLfunction_devel	%mklibname -d Lfunction
 
 Name:		lcalc
-Group:		Sciences/Mathematics
 License:	GPLv2+
 Summary:	C++ L-function class library and command line interface
 Version:	1.23
-Release:	7
+Release:	8
 Source0:	http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-1.23.tar.gz
 # From sage tarball, lcalc spkg, debian directory
 Source1:	lcalc.1
+Source2:	%{name}.rpmlintrc
 URL:		http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/L.html
 BuildRequires:	gcc-c++
 BuildRequires:	gmpxx-devel
@@ -25,14 +25,12 @@ Patch2:		L-1.23-lcalc_to_double.patch
 C++ L-function class library and command line interface.
 
 %package	-n %{libLfunction}
-Group:		Sciences/Mathematics
 Summary:	Runtime library for %{name}
 
 %description	-n %{libLfunction}
 Runtime library for %{name}.
 
 %package	-n %{libLfunction_devel}
-Group:		Development/C++
 Summary:	Development files for %{name}
 %rename		%{name}-devel
 Requires:	%{libLfunction} = %{EVRD}
@@ -114,48 +112,3 @@ popd
 %{_includedir}/Lfunction
 %{_includedir}/lcalc
 %{_libdir}/libLfunction.so
-
-%changelog
-* Mon Dec 17 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.23-7
-- Drop unfinished mpfr support patch.
-- Update URL for source and home page.
-- Generate library with a proper soname.
-- Drop BuildRoot, mkrel, defattr and clean.
-- Create library subpackage with proper major in name.
-- Rename lcalc-devel subpackage to libLfunction_devel.
-
-* Tue Jan 24 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.23-6mdv2012.0
-+ Revision: 767481
-- Rebuild with newer pari.
-
-* Sat Apr 09 2011 Paulo Andrade <pcpa@mandriva.com.br> 1.23-5
-+ Revision: 652002
-- Correct build with gcc 4.6.0
-
-* Thu Nov 11 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-4mdv2011.0
-+ Revision: 595921
-- Rebuild with newer pari
-
-* Tue Aug 17 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-3mdv2011.0
-+ Revision: 571049
-+ rebuild (emptylog)
-
-* Tue Aug 17 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-2mdv2011.0
-+ Revision: 571038
-+ rebuild (emptylog)
-
-* Wed Jul 14 2010 Paulo Andrade <pcpa@mandriva.com.br> 1.23-1mdv2011.0
-+ Revision: 552977
-- Update to version 1.23.
-
-* Sat May 09 2009 Paulo Andrade <pcpa@mandriva.com.br> 1.21-2mdv2010.0
-+ Revision: 373565
-+ rebuild (emptylog)
-
-* Thu Mar 26 2009 Paulo Andrade <pcpa@mandriva.com.br> 1.21-1mdv2009.1
-+ Revision: 361222
-- Initial import of lcalc version 1.21.
-  C++ L-function class library and command line interface
-  http://pmmac03.math.uwaterloo.ca/~mrubinst/L_function_public/L.html
-- lcalc
-
