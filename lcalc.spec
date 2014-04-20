@@ -16,8 +16,8 @@ BuildRequires:	gmpxx-devel
 BuildRequires:	gomp-devel
 BuildRequires:	libpari-devel
 Patch0:		L-fix-broken-include-of-libc++.diff
-# Build with newer pari
-Patch1:		L-1.23-pari.patch
+# Build with pari 2.7
+Patch1:		pari_2.7.patch
 # Correct problem with inline functions casting to double with gcc 4.6 or newer
 Patch2:		L-1.23-lcalc_to_double.patch
 # http://gcc.gnu.org/gcc-4.9/porting_to.html

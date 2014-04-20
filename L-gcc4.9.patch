@@ -9,3 +9,14 @@
  
      //#include "Ltaylor_series.h" //for computing taylor series for Dirichlet series
      //void compute_taylor_series(int N, int K, Complex s_0, Complex *series);
+--- L-1.23/include/Ldirichlet_series.h.orig	2014-04-20 19:18:35.481140046 -0300
++++ L-1.23/include/Ldirichlet_series.h	2014-04-20 19:18:51.046139390 -0300
+@@ -43,7 +43,7 @@ partial_dirichlet_series(Complex s, long
+  //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ template <class ttype>
+ Complex L_function <ttype>::
+-dirichlet_series(Complex s, long long N=-1)
++dirichlet_series(Complex s, long long N)
+ {
+     Complex z=0.;
+     long long m,n;
