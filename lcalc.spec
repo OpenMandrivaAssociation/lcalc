@@ -5,7 +5,7 @@ Name:		lcalc
 License:	GPLv2+
 Summary:	C++ L-function class library and command line interface
 Version:	1.23
-Release:	8
+Release:	9
 Source0:	http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-1.23.tar.gz
 # From sage tarball, lcalc spkg, debian directory
 Source1:	lcalc.1
@@ -20,6 +20,8 @@ Patch0:		L-fix-broken-include-of-libc++.diff
 Patch1:		L-1.23-pari.patch
 # Correct problem with inline functions casting to double with gcc 4.6 or newer
 Patch2:		L-1.23-lcalc_to_double.patch
+# http://gcc.gnu.org/gcc-4.9/porting_to.html
+Patch3:		L-gcc4.9.patch
 
 %description
 C++ L-function class library and command line interface.
@@ -43,6 +45,7 @@ Development files for %{name}.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 rm -f .*DS_Store
 rm -f include/.*{DS_Store,.swp,.swap.crap,.back}
 rm -f src/.*{DS_Store,.swp}
