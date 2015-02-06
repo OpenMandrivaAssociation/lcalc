@@ -5,7 +5,7 @@ Name:		lcalc
 License:	GPLv2+
 Summary:	C++ L-function class library and command line interface
 Version:	1.23
-Release:	9
+Release:	10
 Source0:	http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-1.23.tar.gz
 # From sage tarball, lcalc spkg, debian directory
 Source1:	lcalc.1
