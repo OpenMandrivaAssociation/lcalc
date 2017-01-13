@@ -1,5 +1,5 @@
---- src/Lcommandline.cc
-+++ src/Lcommandline.cc
+--- a/src/Lcommandline.cc
++++ b/src/Lcommandline.cc
 @@ -473,7 +473,7 @@ int main (int argc, char *argv[])
  
  #ifdef INCLUDE_PARI
@@ -9,8 +9,8 @@
               if (my_verbose>0) cout << "Will precompute " << N_terms << " elliptic L-function dirichlet coefficients..." << endl;
               initialize_new_L(a1,a2,a3,a4,a6,N_terms); 
          }
---- src/Lcommandline_elliptic.cc
-+++ src/Lcommandline_elliptic.cc
+--- a/src/Lcommandline_elliptic.cc
++++ b/src/Lcommandline_elliptic.cc
 @@ -133,15 +133,15 @@ void data_E(char *a1, char *a2, char *a3
      //gaffsg(a4,(GEN) F[4]);
      //gaffsg(a6,(GEN) F[5]);
