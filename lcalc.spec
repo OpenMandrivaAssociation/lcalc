@@ -45,7 +45,7 @@ Development files for %{name}.
 
 %prep
 %setup -q -n L-%{version}
-%apply_patches
+%autopatch -p1
 
 rm -f .*DS_Store
 rm -f include/.*{DS_Store,.swp,.swap.crap,.back}
