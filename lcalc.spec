@@ -1,118 +1,90 @@
-%define libLfunction		%mklibname    Lfunction 1
-%define libLfunction_devel	%mklibname -d Lfunction
+%define major	1
+%define libname	%mklibname	Lfunction
+%define devname	%mklibname	Lfunction -d
 
+Summary:	C++ L-function class library and command line interface
 Name:		lcalc
 License:	GPLv2+
-Summary:	C++ L-function class library and command line interface
-Version:	1.23
-Release:	12
-Source0:	http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/CODE/L-1.23.tar.gz
+Version:	2.0.5
+Release:	1
+URL:		https://gitlab.com/sagemath/lcalc
+Source0:	https://gitlab.com/sagemath/lcalc/-/archive/%{version}/%{name}-%{version}.tar.bz2
 # From sage tarball, lcalc spkg, debian directory
-Source1:	lcalc.1
-Source2:	%{name}.rpmlintrc
-URL:		http://oto.math.uwaterloo.ca/~mrubinst/L_function_public/L.html
+#Source1:	lcalc.1
+#Source2:	%{name}.rpmlintrc
+
 BuildRequires:	gcc-c++
-BuildRequires:	gmpxx-devel
-BuildRequires:	gomp-devel
+BuildRequires:	gengetopt
+#BuildRequires:	gomp-devel
+#BuildRequires:	pkgconfig(gmpxx)
 BuildRequires:	libpari-devel
-Patch0:		L-fix-broken-include-of-libc++.diff
-# Build with pari 2.7
-Patch1:		pari_2.7.patch
-# Correct problem with inline functions casting to double with gcc 4.6 or newer
-Patch2:		L-1.23-lcalc_to_double.patch
-# http://gcc.gnu.org/gcc-4.9/porting_to.html
-Patch3:		L-gcc4.9.patch
-Patch4:		L-gcc5.patch
-# Build with pari 2.9
-Patch5:		pari_2.9.patch
 
 %description
 C++ L-function class library and command line interface.
 
-%package	-n %{libLfunction}
+%files
+%license doc/COPYING
+%doc doc/{ChangeLog,CONTRIBUTORS,README.md}
+%{_bindir}/%{name}
+%{_mandir}/man1/lcalc.1*
+
+#---------------------------------------------------------------------------
+
+%package	-n %{libname}
 Summary:	Runtime library for %{name}
 
-%description	-n %{libLfunction}
+%description	-n %{libname}
 Runtime library for %{name}.
 
-%package	-n %{libLfunction_devel}
+%files		-n %{libname}
+%{_libdir}/libLfunction.so.%{major}*
+
+#---------------------------------------------------------------------------
+
+%package	-n %{devname}
 Summary:	Development files for %{name}
 %rename		%{name}-devel
-Requires:	%{libLfunction} = %{EVRD}
 
-%description	-n %{libLfunction_devel}
+Requires:	%{libname} = %{EVRD}
+
+%description	-n %{devname}
 Development files for %{name}.
 
+%files		-n %{devname}
+%doc doc/examples
+%{_includedir}/%{name}/
+%{_libdir}/libLfunction.so
+%{_libdir}/pkgconfig/%{name}.pc
+
+#---------------------------------------------------------------------------
+
 %prep
-%setup -q -n L-%{version}
-%autopatch -p1
-
-rm -f .*DS_Store
-rm -f include/.*{DS_Store,.swp,.swap.crap,.back}
-rm -f src/.*{DS_Store,.swp}
-find . | xargs chmod a+r
-
-# Make it actually link with the generated library
-sed -e 's|/lib/|/%{_lib}/|g' \
- -e "s|^[^#]*LDFLAGS2.*LDFLAGS1.*\$|LDFLAGS2 = \$(LDFLAGS1) $RPM_LD_FLAGS|" \
- -e 's|libLfunction.so|libLfunction.so.%{version}|g' \
- -e 's|\($(CC).*cc\) libLfunction.so.%{version}|\1 -L. -lLfunction|g' \
- -e 's|-Xlinker -rpath .*||;' \
- -e "s|\(DYN_OPTION=shared\)|\1 -Wl,-soname=libLfunction.so.%{version} -lgomp $RPM_LD_FLAGS|" \
- -e 's|#\(OPENMP_FLAG = -fopenmp\)|\1|' \
- -i src/Makefile
-sed -i -e 's/\r//' src/example_programs/example.cc
-# Upstream tarball comes with a prebuilt library
-rm -f src/libLfunction.a
+%autosetup -p1
 
 %build
-pushd src
-# Create link before library is created
-    ln -sf libLfunction.so.%{version} libLfunction.so
-    %make							\
-	EXTRA="$RPM_OPT_FLAGS"					\
-	PARI_DEFINE="-DINCLUDE_PARI"				\
-	LOCATION_PARI_H="%{_includedir}/pari"			\
-	LOCATION_PARI_LIBRARY="%{_libdir}"			\
-	all
-popd
-rm -f src/example_programs/example
+autoreconf -fiv
+%configure \
+	--with-pari
+
+# (fedora)
+# Get rid of undesirable hardcoded rpaths; workaround libtool reordering
+# -Wl,--as-needed after all the libraries.
+sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
+    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
+    -e 's|CC="\(g..\)"|CC="\1 -Wl,--as-needed"|' \
+    -i libtool
+
+%make_build
 
 %install
-mkdir -p $RPM_BUILD_ROOT{%{_includedir},%{_libdir},%{_bindir},%{_mandir}/man1}
-pushd src
-    make INSTALL_DIR="$RPM_BUILD_ROOT%{_prefix}" install
-    mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
-    pushd example_data_files
-	for sample in *; do
-	    install -p -m644 $sample $RPM_BUILD_ROOT%{_datadir}/%{name}/$sample
-	done
-    popd
-    install -m644 example_programs/example.cc \
-	$RPM_BUILD_ROOT%{_datadir}/%{name}/example.cc
-popd
-install -p -m644 %{SOURCE1} $RPM_BUILD_ROOT%{_mandir}/man1
-ln -sf libLfunction.so.%{version} $RPM_BUILD_ROOT%{_libdir}/libLfunction.so
-# Correct permissions
-chmod 644 $RPM_BUILD_ROOT%{_includedir}/Lfunction/*.h
-# Make install creates include/Lfunction but sagemath wants include/lcalc
-pushd $RPM_BUILD_ROOT%{_includedir}
-    ln -sf Lfunction lcalc
-popd
+%make_install
 
-%files
-%doc CONTRIBUTORS
-%doc COPYING
-%doc README
-%{_bindir}/%{name}
-%dir %{_datadir}/%{name}
-%{_datadir}/%{name}/*
-%{_mandir}/man1/*
+# data dir
+install -pm 0755 -d %{buildroot}%{_datadir}/%{name}
 
-%files		-n %{libLfunction}
-%{_libdir}/libLfunction.so.%{version}
+# manually select docs
+rm -fr %{buildroot}%{_docdir}/lcalc
 
-%files		-n %{libLfunction_devel}
-%{_includedir}/Lfunction
-%{_includedir}/lcalc
-%{_libdir}/libLfunction.so
+%check
+%make check
+
