@@ -5,7 +5,7 @@
 Summary:	C++ L-function class library and command line interface
 Name:		lcalc
 License:	GPLv2+
-Version:	2.1.0
+Version:	2.1.1
 Release:	1
 URL:		https://gitlab.com/sagemath/lcalc
 Source0:	https://gitlab.com/sagemath/lcalc/-/archive/%{version}/%{name}-%{version}.tar.bz2
