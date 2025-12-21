@@ -13,6 +13,11 @@ Source0:	https://gitlab.com/sagemath/lcalc/-/archive/%{version}/%{name}-%{versio
 #Source1:	lcalc.1
 #Source2:	%{name}.rpmlintrc
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	gcc-c++
 BuildRequires:	gengetopt
 #BuildRequires:	gomp-devel
